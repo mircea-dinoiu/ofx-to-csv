@@ -8,10 +8,12 @@ const moment = require('moment');
 
 const main = () => {
     const filePath = argv.file;
-    const accountName = argv.accountName;
 
     const fileContents = fs.readFileSync(filePath, 'utf-8')
-    const transactions = mapOfxToTransactions(ofx.parse(fileContents.toString()));
+    const ofxContents = ofx.parse(fileContents.toString());
+
+    const transactions = mapOfxToTransactions(ofxContents);
+    const accountName = mapOfxToAccountName(ofxContents);
     const output = stringify([
         [
             'Date',
@@ -52,11 +54,7 @@ const main = () => {
 }
 
 const mapOfxToTransactions = (data) => {
-    if (!data) {
-        return [];
-    }
-
-    if (data.BANKTRANLIST) {
+    if (data && data.BANKTRANLIST) {
         return data.BANKTRANLIST.STMTTRN;
     }
 
@@ -67,6 +65,20 @@ const mapOfxToTransactions = (data) => {
     }
 
     return [];
+};
+
+const mapOfxToAccountName = (data) => {
+    if (data && data.FI) {
+        return data.FI.ORG;
+    }
+
+    if (isPlainObject(data)) {
+        return Object.values(data).reduce((acc, each) => {
+            return acc.concat(mapOfxToAccountName(each));
+        }, []).filter(Boolean)[0] || '';
+    }
+
+    return '';
 };
 
 

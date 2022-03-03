@@ -4,6 +4,6 @@ Some accounts can export OFX/QFX but do not have a Quicken license, therefore ca
 By converting to Mint's CSV format, there is no license check stopping one from importing.
 
 ```
-$ node . --file ~/Downloads/file.qfx --account-name 'My Checking Account'
+$ node . --file ~/Downloads/file.qfx
 ```
 The above command will generate a `~/Downloads/file.csv` file that can be imported.
